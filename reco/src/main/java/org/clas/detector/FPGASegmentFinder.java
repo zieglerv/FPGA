@@ -85,12 +85,12 @@ public class FPGASegmentFinder {
 					int iwirplus1 = iwir + 1;
 					if(iwirplus1>111)
 						iwirplus1 =111;
-					_BottomTriangleComponents[isec][islr][iwir][0] = (_HitArray[isec][islr][0][iwirmin1] 
+					_BottomTriangleComponents[isec][islr][iwir][2] = (_HitArray[isec][islr][0][iwirmin1] 
 							|| _HitArray[isec][islr][0][iwir] 
 							|| _HitArray[isec][islr][0][iwirplus1]);
 					_BottomTriangleComponents[isec][islr][iwir][1] = (_HitArray[isec][islr][1][iwirmin1] 
 							|| _HitArray[isec][islr][1][iwir]);
-					_BottomTriangleComponents[isec][islr][iwir][2] = _HitArray[isec][islr][2][iwir];
+					_BottomTriangleComponents[isec][islr][iwir][0] = _HitArray[isec][islr][2][iwir];
 					
 					_TopTriangleComponents[isec][islr][iwir][0] = _HitArray[isec][islr][3][iwir]; 
 					_TopTriangleComponents[isec][islr][iwir][1] = (_HitArray[isec][islr][4][iwir]
@@ -121,7 +121,7 @@ public class FPGASegmentFinder {
 							(_BottomTriangleComponents[isec][islr][iwir][0] 
 							|| _BottomTriangleComponents[isec][islr][iwir][1]) 
 							|| _BottomTriangleComponents[isec][islr][iwir][2]
-							) && !_BottomTriangle[isec][islr][iwir][2]
+							) && !_BottomTriangle[isec][islr][iwir][2] && !_BottomTriangle[isec][islr][iwir][1]
 									);
 
 					//this triangle has hits in all 3 layers
@@ -146,7 +146,7 @@ public class FPGASegmentFinder {
 							(_TopTriangleComponents[isec][islr][iwir][0] 
 							|| _TopTriangleComponents[isec][islr][iwir][1]) 
 							|| _TopTriangleComponents[isec][islr][iwir][2]
-							) && !_TopTriangle[isec][islr][iwir][2]
+							) && !_TopTriangle[isec][islr][iwir][2] && !_TopTriangle[isec][islr][iwir][1]
 									);
 				}
 				
@@ -164,7 +164,7 @@ public class FPGASegmentFinder {
 					
 					for(int ti = 0; ti<3; ti++) {
 						for(int bi = 0; bi<3; bi++) {
-							if( (ti==1 && bi==0 ) || (ti==0 && bi==1 ) )
+							if( (ti==1 && bi==0 ) || (ti==0 && bi==1 ) || (ti==0 && bi==0 ))
 								continue;
 					_SegmentComponents[isec][islr][iwir][ti][bi] = ( 
 							(_TopTriangle[isec][islr][iwir][ti] 
