@@ -125,33 +125,7 @@ public class EventViewer implements IDataEventListener, DetectorListener {
 						DetectorPanels.get(isec).getView().addShape("DC", module);	
 						DetectorPanels.get(isec).repaint();
 					}
-					if(en.get_LeftSegment()[isec][islr][iwir]) {
-						System.out.println("FPGA Algo: Wire "+(iwir+1)+" is in Left-Segment located in Sector "+(isec+1)+", Superlayer "+(islr+1));
-						DetectorShape2D module = new DetectorShape2D(DetectorType.DC,islr,0, iwir);					
-						module.createBarXY(2, 2);					
-						module.getShapePath().translateXYZ((1-1)*2+(12+2)*(islr), iwir, 0);								
-						module.setColor(0,255,127); 	//green				
-						DetectorPanels.get(isec).getView().addShape("DC", module);	
-						DetectorPanels.get(isec).repaint();
-					}
-					if(en.get_RightSegment()[isec][islr][iwir]) {
-						System.out.println("FPGA Algo: Wire "+(iwir+1)+" is in Right-Segment located in Sector "+(isec+1)+", Superlayer "+(islr+1));
-						DetectorShape2D module = new DetectorShape2D(DetectorType.DC,islr,0, iwir);					
-						module.createBarXY(2, 2);					
-						module.getShapePath().translateXYZ((1-1)*2+(12+2)*(islr), iwir, 0);								
-						module.setColor(255,105,180); 	//pink				
-						DetectorPanels.get(isec).getView().addShape("DC", module);	
-						DetectorPanels.get(isec).repaint();
-					}
-					if(en.get_CenterSegment()[isec][islr][iwir]) {
-						System.out.println("FPGA Algo: Wire "+(iwir+1)+" is in Center-Segment located in Sector "+(isec+1)+", Superlayer "+(islr+1));
-						DetectorShape2D module = new DetectorShape2D(DetectorType.DC,islr,0, iwir);					
-						module.createBarXY(2, 2);					
-						module.getShapePath().translateXYZ((1-1)*2+(12+2)*(islr), iwir, 0);								
-						module.setColor(160,32,240); 	 	//purple			
-						DetectorPanels.get(isec).getView().addShape("DC", module);	
-						DetectorPanels.get(isec).repaint();
-					}
+					
 				}
 			}
 			//DetectorPanels.get(isec).repaint();

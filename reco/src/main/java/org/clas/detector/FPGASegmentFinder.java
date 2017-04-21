@@ -27,43 +27,16 @@ public class FPGASegmentFinder {
 	private boolean _HitArray[][][][] 					= new boolean[6][6][6][112];
 	private boolean _BottomTriangleComponents[][][][] 	= new boolean[6][6][112][3];
 	private boolean _TopTriangleComponents[][][][] 		= new boolean[6][6][112][3];
-	private boolean _BottomTriangle[][][] 				= new boolean[6][6][112];
-	private boolean _TopTriangle[][][] 					= new boolean[6][6][112];
+	private boolean _BottomTriangle[][][][] 			= new boolean[6][6][112][3];
+	private boolean _TopTriangle[][][][] 				= new boolean[6][6][112][3];
+	private boolean _SegmentComponents[][][][][] 		= new boolean[6][6][112][3][3];
 	private boolean _Segment[][][] 						= new boolean[6][6][112];
-	private boolean _LeftSegment[][][] 					= new boolean[6][6][112];
-	private boolean _RightSegment[][][] 				= new boolean[6][6][112];
-	private boolean _CenterSegment[][][] 				= new boolean[6][6][112];
-	
 	public boolean[][][] get_Segment() {
 		return _Segment;
 	}
 
 	public void set_Segment(boolean[][][] _Segment) {
 		this._Segment = _Segment;
-	}
-
-	public boolean[][][] get_LeftSegment() {
-		return _LeftSegment;
-	}
-
-	public void set_LeftSegment(boolean[][][] _LeftSegment) {
-		this._LeftSegment = _LeftSegment;
-	}
-
-	public boolean[][][] get_RightSegment() {
-		return _RightSegment;
-	}
-
-	public void set_RightSegment(boolean[][][] _RightSegment) {
-		this._RightSegment = _RightSegment;
-	}
-
-	public boolean[][][] get_CenterSegment() {
-		return _CenterSegment;
-	}
-
-	public void set_CenterSegment(boolean[][][] _CenterSegment) {
-		this._CenterSegment = _CenterSegment;
 	}
 
 	public void FillHitArray(DataEvent event) {
@@ -93,14 +66,12 @@ public class FPGASegmentFinder {
 	}
 	
 	public void BuildPatterns() {
-		_BottomTriangleComponents= new boolean[6][6][112][3];
-		_TopTriangleComponents = new boolean[6][6][112][3];
-		_BottomTriangle = new boolean[6][6][112];
-		_TopTriangle = new boolean[6][6][112];
-		_Segment = new boolean[6][6][112];
-		_LeftSegment = new boolean[6][6][112];
-		_RightSegment = new boolean[6][6][112];
-		_CenterSegment = new boolean[6][6][112];
+		_BottomTriangleComponents	= new boolean[6][6][112][3];
+		_TopTriangleComponents 		= new boolean[6][6][112][3];
+		_BottomTriangle 			= new boolean[6][6][112][3];
+		_TopTriangle 				= new boolean[6][6][112][3];
+		_SegmentComponents 			= new boolean[6][6][112][3][3];
+		_Segment 					= new boolean[6][6][112];
 		
 		for(int isec = 0; isec < 6; isec++) {
 			for(int islr = 0; islr < 6; islr++) {
@@ -128,33 +99,92 @@ public class FPGASegmentFinder {
 							|| _HitArray[isec][islr][5][iwir]
 							|| _HitArray[isec][islr][5][iwirplus1]); 
 					
-					_BottomTriangle[isec][islr][iwir] = ( (_BottomTriangleComponents[isec][islr][iwir][0] && _BottomTriangleComponents[isec][islr][iwir][1] )
-							|| (_BottomTriangleComponents[isec][islr][iwir][0] && _BottomTriangleComponents[isec][islr][iwir][2] )
-							|| (_BottomTriangleComponents[isec][islr][iwir][1] && _BottomTriangleComponents[isec][islr][iwir][2] ) );
-					_TopTriangle[isec][islr][iwir] = ( (_TopTriangleComponents[isec][islr][iwir][0] && _TopTriangleComponents[isec][islr][iwir][1] )
-							|| (_TopTriangleComponents[isec][islr][iwir][0] && _TopTriangleComponents[isec][islr][iwir][2] )
-							|| (_TopTriangleComponents[isec][islr][iwir][1] && _TopTriangleComponents[isec][islr][iwir][2] ) );
-					
+					//this triangle has hits in all 3 layers
+					_BottomTriangle[isec][islr][iwir][2] = ( 
+							_BottomTriangleComponents[isec][islr][iwir][0] 
+							&& _BottomTriangleComponents[isec][islr][iwir][1]
+							&& _BottomTriangleComponents[isec][islr][iwir][2]);
+					//this triangle has hits in only 2 layers
+					_BottomTriangle[isec][islr][iwir][1] = ( 
+							(
+							(_BottomTriangleComponents[isec][islr][iwir][0] 
+							&& _BottomTriangleComponents[isec][islr][iwir][1]) || 
+							(_BottomTriangleComponents[isec][islr][iwir][0]
+							&& _BottomTriangleComponents[isec][islr][iwir][2]) || 
+							(_BottomTriangleComponents[isec][islr][iwir][1]
+							&& _BottomTriangleComponents[isec][islr][iwir][2])
+							) && !_BottomTriangle[isec][islr][iwir][2]
+									);				
+						//this triangle has hits in only 1 layer
+					_BottomTriangle[isec][islr][iwir][0] = ( 
+							(
+							(_BottomTriangleComponents[isec][islr][iwir][0] 
+							|| _BottomTriangleComponents[isec][islr][iwir][1]) 
+							|| _BottomTriangleComponents[isec][islr][iwir][2]
+							) && !_BottomTriangle[isec][islr][iwir][2]
+									);
+
+					//this triangle has hits in all 3 layers
+					_TopTriangle[isec][islr][iwir][2] = ( 
+							_TopTriangleComponents[isec][islr][iwir][0] 
+							&& _TopTriangleComponents[isec][islr][iwir][1]
+							&& _TopTriangleComponents[isec][islr][iwir][2]);
+					//this triangle has hits in only 2 layers
+					_TopTriangle[isec][islr][iwir][1] = ( 
+							(
+							(_TopTriangleComponents[isec][islr][iwir][0] 
+							&& _TopTriangleComponents[isec][islr][iwir][1]) || 
+							(_TopTriangleComponents[isec][islr][iwir][0]
+							&& _TopTriangleComponents[isec][islr][iwir][2]) || 
+							(_TopTriangleComponents[isec][islr][iwir][1]
+							&& _TopTriangleComponents[isec][islr][iwir][2])
+							) && !_TopTriangle[isec][islr][iwir][2]
+									);				
+						//this triangle has hits in only 1 layer
+					_TopTriangle[isec][islr][iwir][0] = ( 
+							(
+							(_TopTriangleComponents[isec][islr][iwir][0] 
+							|| _TopTriangleComponents[isec][islr][iwir][1]) 
+							|| _TopTriangleComponents[isec][islr][iwir][2]
+							) && !_TopTriangle[isec][islr][iwir][2]
+									);
 				}
 				
 				for(int iwir = 0; iwir < 112; iwir++) {
-					
+				
+					int iwirmin2 = iwir - 2;
+					if(iwirmin2<0)
+						iwirmin2 =0;					
 					int iwirmin1 = iwir - 1;
 					if(iwirmin1<0)
 						iwirmin1 =0;
-				/*	int iwirplus1 = iwir + 1;
+					int iwirplus1 = iwir + 1;
 					if(iwirmin1>111)
-						iwirmin1 =111; */ // not used
+						iwirmin1 =111; 
 					
-					_Segment[isec][islr][iwir] = ( ( _TopTriangle[isec][islr][iwir]  && _BottomTriangle[isec][islr][iwirmin1] ) 
-							|| ( _TopTriangle[isec][islr][iwir]  && _BottomTriangle[isec][islr][iwir] ) );
-					_LeftSegment[isec][islr][iwir] = ( ( _TopTriangle[isec][islr][iwir]  && _BottomTriangle[isec][islr][iwirmin1] ) 
-							&& !( _TopTriangle[isec][islr][iwir]  && _BottomTriangle[isec][islr][iwir] ) );
-					_RightSegment[isec][islr][iwir] = ( !( _TopTriangle[isec][islr][iwir]  && _BottomTriangle[isec][islr][iwirmin1] ) 
-							&& ( _TopTriangle[isec][islr][iwir]  && _BottomTriangle[isec][islr][iwir] ) );
-					_CenterSegment[isec][islr][iwir] = ( _TopTriangle[isec][islr][iwir]  && _BottomTriangle[isec][islr][iwirmin1] 
-							&& _TopTriangle[isec][islr][iwir]  && _BottomTriangle[isec][islr][iwir] ) ;
+					for(int ti = 0; ti<3; ti++) {
+						for(int bi = 0; bi<3; bi++) {
+							if( (ti==1 && bi==0 ) || (ti==0 && bi==1 ) )
+								continue;
+					_SegmentComponents[isec][islr][iwir][ti][bi] = ( 
+							(_TopTriangle[isec][islr][iwir][ti] 
+							&& _BottomTriangle[isec][islr][iwir][bi] ) 
+							|| (_TopTriangle[isec][islr][iwir][ti] 
+							&& _BottomTriangle[isec][islr][iwirmin1][bi] ) 
+							|| (_TopTriangle[isec][islr][iwir][ti] 
+							&& _BottomTriangle[isec][islr][iwirmin2][bi] ) 
+							|| ( _TopTriangle[isec][islr][iwir][ti]  
+							&& _BottomTriangle[isec][islr][iwirplus1][bi] )
+							);
+						}
+					}
 					
+					_Segment[isec][islr][iwir] = _SegmentComponents[isec][islr][iwir][2][2] 
+							                  || _SegmentComponents[isec][islr][iwir][2][1] 
+									          || _SegmentComponents[isec][islr][iwir][1][2]
+									          || _SegmentComponents[isec][islr][iwir][1][1]
+											  || _SegmentComponents[isec][islr][iwir][0][2]
+											  || _SegmentComponents[isec][islr][iwir][2][0];
 				}
 			}
 		}
@@ -167,12 +197,6 @@ public class FPGASegmentFinder {
 				for(int iwir = 0; iwir < 112; iwir++) {
 					if(_Segment[isec][islr][iwir])
 						System.out.println("Wire "+(iwir+1)+" is in Segment located in Sector "+(isec+1)+", Superlayer "+(islr+1));
-					if(_LeftSegment[isec][islr][iwir])
-						System.out.println("Wire "+(iwir+1)+" is in Left-Segment located in Sector "+(isec+1)+", Superlayer "+(islr+1));
-					if(_RightSegment[isec][islr][iwir])
-						System.out.println("Wire "+(iwir+1)+" is in Right-Segment located in Sector "+(isec+1)+", Superlayer "+(islr+1));
-					if(_CenterSegment[isec][islr][iwir])
-						System.out.println("Wire "+(iwir+1)+" is in Center-Segment located in Sector "+(isec+1)+", Superlayer "+(islr+1));
 				}
 			}
 		}
